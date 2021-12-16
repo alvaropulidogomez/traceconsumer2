@@ -1,0 +1,75 @@
+---
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+
+  name: kafka-service
+
+spec:
+
+  ports:
+
+    - port: 9092
+
+      name: kafka-port
+
+      protocol: TCP
+
+  selector:
+
+    app: kafka
+
+---
+
+kind: Deployment
+
+apiVersion: apps/v1
+
+metadata:
+
+  name: kafka
+
+  labels:
+
+    app: kafka
+
+spec:
+
+  replicas: 1
+
+  selector:
+
+    matchLabels:
+
+      app: kafka
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: kafka
+
+    spec:
+
+      containers:
+
+        - name: kafka
+
+          image: johnnypark/kafka-zookeeper
+
+          ports:
+
+            - containerPort: 9092
+
+          env:
+
+            - name: ADVERTISED_HOST
+
+              value: kafka-service
+
+ 

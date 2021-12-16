@@ -1,0 +1,157 @@
+apiVersion: v1
+
+kind: Service
+
+metadata:
+
+  name: traceconsumer2-srv
+
+spec:
+
+  selector:
+
+    app: traceconsumer2
+
+  ports:
+
+  - protocol: TCP
+
+    port: 80
+
+    targetPort: 8080
+
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: traceconsumer2-dpl
+
+  labels:
+
+    app: traceconsumer2
+
+spec:
+
+  replicas: 1
+
+  selector:
+
+    matchLabels:
+
+      app: traceconsumer2
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: traceconsumer2
+
+    spec:
+
+      containers:
+
+      - name: traceconsumer2
+
+        image: registry.gitlab.com/adf99-apsv/traceconsumer2
+
+        ports:
+
+        - containerPort: 8080
+
+        env:
+
+        - name: spring.cloud.stream.kafka.binder.brokers
+
+          value: "${KAFKA_SERVICE_SERVICE_HOST}:9092"
+
+      imagePullSecrets:
+
+      - name: gitlab-registry
+
+---
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+
+  name: traceproducer-srv
+
+spec:
+
+  selector:
+
+    app: traceproducer
+
+  ports:
+
+  - protocol: TCP
+
+    port: 80
+
+    targetPort: 8080
+
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: traceproducer-dpl
+
+  labels:
+
+    app: traceproducer
+
+spec:
+
+  replicas: 1
+
+  selector:
+
+    matchLabels:
+
+      app: traceproducer
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: traceproducer
+
+    spec:
+
+      containers:
+
+      - name: traceproducer
+
+        image: registry.gitlab.com/adf99-apsv/traceproducer
+
+        ports:
+
+        - containerPort: 8080
+
+        env:
+
+        - name: spring.cloud.stream.kafka.binder.brokers
+
+          value: "${KAFKA_SERVICE_SERVICE_HOST}:9092"
+
+      imagePullSecrets:
+
+       - name: gitlab-registry
